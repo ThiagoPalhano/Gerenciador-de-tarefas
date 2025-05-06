@@ -2,11 +2,11 @@ import sqlite3
 from datetime import datetime
 
 def inicializar_banco():
-    with sqlite3.connect('gerenciador_DOA.db') as conn:
+    with sqlite3.connect('gerenciador_DAO.db') as conn:
         cursor = conn.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS tarefas (
-               id INTEGER PRIMARY KEY,
+               id INTEGER PRIMARY KEY AUTOINCREMENT,
                nome_tarefa TEXT NOT NULL,
                descricao TEXT NOT NULL,
                data_criacao DATETIME NOT NULL,
@@ -19,7 +19,7 @@ def inicializar_banco():
 
 def adicionar_tarefa(nome_tarefa, descricao, data_vencimento, prioridade, status="Pendente"):
     data_criacao = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    with sqlite3.connect('gerenciador_DOA.db') as conn:
+    with sqlite3.connect('gerenciador_DAO.db') as conn:
         cursor = conn.cursor()
         cursor.execute('''
             INSERT INTO tarefas (nome_tarefa, descricao, data_criacao, data_vencimento, prioridade, status_tarefa)
@@ -29,7 +29,7 @@ def adicionar_tarefa(nome_tarefa, descricao, data_vencimento, prioridade, status
         print(f"Tarefa '{nome_tarefa}' adicionada com sucesso!")
 
 def deletar_tarefas(ids):
-    with sqlite3.connect('gerenciador_DOA.db') as conn:
+    with sqlite3.connect('gerenciador_DAO.db') as conn:
         cursor = conn.cursor()
         for id in ids:
             cursor.execute('SELECT id FROM tarefas WHERE id = ?', (id,))
@@ -41,7 +41,7 @@ def deletar_tarefas(ids):
         conn.commit()
         
 def atualizar_status(id, novo_status):
-    with sqlite3.connect('gerenciador_DOA.db') as conn:
+    with sqlite3.connect('gerenciador_DAO.db') as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT id FROM tarefas WHERE id = ?', (id,))
         if cursor.fetchone():
@@ -56,7 +56,7 @@ def atualizar_status(id, novo_status):
             print(f"Nenhuma tarefa encontrada com ID {id}.")
 
 def consultar_tarefas():
-    with sqlite3.connect('gerenciador_DOA.db') as conn:
+    with sqlite3.connect('gerenciador_DA.db') as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM tarefas')
         tarefas = cursor.fetchall()
@@ -70,7 +70,7 @@ def consultar_tarefas():
             print("Nenhuma tarefa encontrada.")
 
 def reajustar_ids():
-    with sqlite3.connect('gerenciador_DOA.db') as conn:
+    with sqlite3.connect('gerenciador_DAO.db') as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT id FROM tarefas ORDER BY id')
         tarefas = cursor.fetchall()
@@ -81,8 +81,6 @@ def reajustar_ids():
         print("IDs foram reorganizados!")
 
 
-
-# Inicializar banco de dados
 inicializar_banco()
 
 consultar_tarefas()
