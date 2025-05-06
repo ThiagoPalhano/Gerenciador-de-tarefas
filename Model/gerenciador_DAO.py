@@ -17,7 +17,7 @@ class GerenciadorDAO :
            data_criacao DATETIME,
            data_vencimento DATETIME,
            prioridade TEXT NOT NULL,
-           status_tarefa TEXT NOT NULL,
+           status_tarefa TEXT NOT NULL
         )
         ''' 
         self.cur.execute(query)
