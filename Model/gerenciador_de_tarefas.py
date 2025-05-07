@@ -145,15 +145,17 @@ gerenciador = GerenciadorTarefas("GerenciadorDAO.db")
 #print(gerenciador.adicionar_tarefa(1, "Reunião com Paulo", "Discutir progresso do projeto", "2025-04-29", "Média"))
 
 # Consultando tarefas
-tarefas_encontradas = gerenciador.consultar_tarefas(1)
+"""tarefas_encontradas = gerenciador.consultar_tarefas(1)
+
 if tarefas_encontradas:
     print("\nTarefas de {usuario_nome}:")
     print("-" * 50)
     for tarefa in tarefas_encontradas:
         print(f"ID: {tarefa[0]} | Tarefa: {tarefa[1]} | Descrição: {tarefa[2]} | Prioridade: {tarefa[3]} | Status: {tarefa[4]}")
 else:
-    print("Nenhuma tarefa encontrada.")
+print("Nenhuma tarefa encontrada.")"""
 
+# Deletando tarefas
 """resultado = gerenciador.deletar_tarefa(tarefa_nome="Reunião com Paulo")  
 
 if "sucesso" in resultado.lower():
