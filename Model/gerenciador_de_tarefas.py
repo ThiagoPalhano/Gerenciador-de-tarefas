@@ -64,8 +64,8 @@ class GerenciadorTarefas:
     def consultar_usuario(self, usuario_id: int = None, nome: str = None) -> list:
 
         with self.conn as conn:
-            cursor = conn.cursor()
-        
+         cursor = conn.cursor()
+
         if usuario_id:
             cursor.execute('SELECT id, nome, idade, email FROM usuario WHERE id = ?', (usuario_id,))
         elif nome:
@@ -74,9 +74,8 @@ class GerenciadorTarefas:
             return "Erro: É necessário informar o ID ou o nome do usuário."
 
         usuario = cursor.fetchall()
+        return usuario if usuario else "Nenhum usuário encontrado." 
     
-        return usuario if usuario else "Nenhum usuário encontrado."
-
 
     def adicionar_tarefa(self, usuario_id: int, tarefa_nome: str, descricao: str, data_vencimento: str, prioridade: str, status="Pendente") -> str:
     
