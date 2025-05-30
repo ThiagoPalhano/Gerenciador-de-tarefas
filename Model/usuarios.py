@@ -1,5 +1,5 @@
 from typing import Optional, List
-from Model.gerenciador_dao import GerenciadorDao
+from gerenciador_dao import GerenciadorDao
 
 class Usuario:
     dao: Optional[GerenciadorDao] = None
