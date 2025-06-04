@@ -3,7 +3,6 @@ from typing import List, Optional, Dict
 
 class UsuarioDao:
     def __init__(self, dbpath: str):
-    
         self.conn = sqlite3.connect(dbpath)
         self.conn.row_factory = sqlite3.Row
 
@@ -19,8 +18,7 @@ class UsuarioDao:
             ''')
             conn.commit()
 
-    def add_usuario(self, nome: str, idade: int, email: str) -> str:
-    
+    def add_usuario(self, nome: str, idade: Optional[int], email: str) -> str:
         with self.conn as conn:
             cursor = conn.cursor()
             try:
@@ -29,10 +27,11 @@ class UsuarioDao:
                     VALUES (?, ?, ?)
                 ''', (nome, idade, email))
                 conn.commit()
-                return f"Usuário '{nome}' adicionado com sucesso!"
+                user_id = cursor.lastrowid
+                return f"Usuário '{nome}' adicionado com sucesso! ID: {user_id}"
             except sqlite3.IntegrityError:
                 return f"Erro: O email '{email}' já está cadastrado."
-            
+
     def get_usuario(self, usuario_id: Optional[int] = None, nome: Optional[str] = None) -> List[Dict]:
         with self.conn as conn:
             cursor = conn.cursor()
@@ -45,8 +44,8 @@ class UsuarioDao:
                 cursor.execute('SELECT * FROM usuario')
 
             usuarios = cursor.fetchall()
-            return [dict(u) for u in usuarios] 
-    
+            return [dict(u) for u in usuarios]
+
     def delete_usuario(self, usuario_id: int) -> str:
         with self.conn as conn:
             cursor = conn.cursor()
@@ -57,9 +56,9 @@ class UsuarioDao:
                 return f"Nenhum usuário com ID {usuario_id} encontrado."
 
             return f"Usuário ID {usuario_id} deletado com sucesso."
-        
+
     def list_all(self) -> List[Dict]:
-        return self.consultar_usuario()
+        return self.get_usuario()
 
     def __del__(self):
         

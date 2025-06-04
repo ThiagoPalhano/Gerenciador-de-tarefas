@@ -14,40 +14,41 @@ class GerenciadorDao:
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS tarefas (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    usuario_id INTEGER,
+                    usuario_ID INTEGER NOT NULL,
                     tarefa_nome TEXT NOT NULL,
                     descricao TEXT NOT NULL,
                     data_criacao TEXT NOT NULL,
                     data_vencimento TEXT NOT NULL,
                     prioridade TEXT NOT NULL,
-                    status_tarefa TEXT NOT NULL
+                    status_tarefa TEXT NOT NULL,
+                    FOREIGN KEY (usuario_ID) REFERENCES usuarios(id)
                 )
             ''')
             conn.commit()
 
-    def create_tarefa(self, usuario_id: int, tarefa_nome: str, descricao: str,
+    def create_tarefa(self, usuario_ID: int, tarefa_nome: str, descricao: str,
                       data_criacao: str, data_vencimento: str,
                       prioridade: str, status: str) -> int:
         with self.conn as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO tarefas (usuario_id, tarefa_nome, descricao, data_criacao, data_vencimento, prioridade, status_tarefa)
+                INSERT INTO tarefas (usuario_ID, tarefa_nome, descricao, data_criacao, data_vencimento, prioridade, status_tarefa)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (usuario_id, tarefa_nome, descricao, data_criacao, data_vencimento, prioridade, status))
+            ''', (usuario_ID, tarefa_nome, descricao, data_criacao, data_vencimento, prioridade, status))
             conn.commit()
             return cursor.lastrowid
 
-    def update_tarefa(self, id: int, usuario_id: int, tarefa_nome: str, descricao: str,
+    def update_tarefa(self, id: int, tarefa_nome: str, descricao: str,
                       data_criacao: str, data_vencimento: str,
                       prioridade: str, status: str):
         with self.conn as conn:
             cursor = conn.cursor()
             cursor.execute('''
                 UPDATE tarefas SET
-                    usuario_id = ?, tarefa_nome = ?, descricao = ?, data_criacao = ?, 
+                    tarefa_nome = ?, descricao = ?, data_criacao = ?, 
                     data_vencimento = ?, prioridade = ?, status_tarefa = ?
                 WHERE id = ?
-            ''', (usuario_id, tarefa_nome, descricao, data_criacao, data_vencimento, prioridade, status, id))
+            ''', (tarefa_nome, descricao, data_criacao, data_vencimento, prioridade, status, id))
             conn.commit()
 
     def delete_tarefa(self, id: int):
@@ -67,6 +68,13 @@ class GerenciadorDao:
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM tarefas')
             return cursor.fetchall()
+        
+    def list_tarefas_por_usuario(self, usuario_id: int) -> List[sqlite3.Row]:
+        with self.conn as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM tarefas WHERE usuario_ID = ?', (usuario_id,))
+            return cursor.fetchall()
 
     def __del__(self):
         self.conn.close()
+        

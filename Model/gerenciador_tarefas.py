@@ -1,5 +1,5 @@
 from typing import Optional, List
-from gerenciador_dao import GerenciadorDao
+from Model.gerenciador_dao import GerenciadorDao
 
 
 class Tarefa:
@@ -21,6 +21,8 @@ class Tarefa:
         cls.dao = dao
 
     def save(self):
+        if self.dao is None:
+            raise ValueError("DAO não configurado. Use Tarefa.set_dao() para configurar.")
 
         if self.id is None:
             self.id = self.dao.create_tarefa(
@@ -45,6 +47,9 @@ class Tarefa:
             )
 
     def delete(self):
+        if self.dao is None:
+            raise ValueError("DAO não configurado. Use Tarefa.set_dao() para configurar.")
+
         if self.id is not None:
             self.dao.delete_tarefa(self.id)
             self.id = None
@@ -58,7 +63,7 @@ class Tarefa:
         if data:
             return cls(
                 id=data["id"],
-                usuario_id=data["usuario_id"],
+                usuario_id=data["usuario_ID"],
                 tarefa_nome=data["tarefa_nome"],
                 descricao=data["descricao"],
                 data_criacao=data["data_criacao"],
@@ -77,7 +82,7 @@ class Tarefa:
         return [
             cls(
                 id=data["id"],
-                usuario_id=data["usuario_id"],
+                usuario_id=data["usuario_ID"],
                 tarefa_nome=data["tarefa_nome"],
                 descricao=data["descricao"],
                 data_criacao=data["data_criacao"],
