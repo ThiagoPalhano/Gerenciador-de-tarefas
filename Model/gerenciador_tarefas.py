@@ -37,10 +37,8 @@ class Tarefa:
         else:
             self.dao.update_tarefa(
                 self.id,
-                self.usuario_id,
                 self.tarefa_nome,
                 self.descricao,
-                self.data_criacao,
                 self.data_vencimento,
                 self.prioridade,
                 self.status

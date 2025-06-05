@@ -28,6 +28,9 @@ class UsuarioDao:
                 VALUES (?, ?, ?)
             ''', (nome, idade, email))
             conn.commit()
+            if cursor.lastrowid is None:
+                raise ValueError("Erro ao inserir usuário. Verifique os dados fornecidos.")
+            return cursor.lastrowid
             
 
     def update_usuario(self, usuario_id: int, nome: str, idade: Optional[int], email: str):
