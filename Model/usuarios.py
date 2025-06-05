@@ -1,5 +1,7 @@
+
 from typing import Optional, List
-from usuario_dao import UsuarioDao 
+from Model.usuario_dao import UsuarioDao
+
 
 class Usuario:
     dao: Optional[UsuarioDao] = None
@@ -20,7 +22,7 @@ class Usuario:
             raise ValueError("DAO não configurado. Use Usuario.set_dao().")
 
         if self.id is None:
-            self.id = self.dao.create_usuario(
+            self.id = self.dao.add_usuario(
                 self.nome,
                 self.idade,
                 self.email
@@ -38,7 +40,8 @@ class Usuario:
             raise ValueError("DAO não configurado. Use Usuario.set_dao().")
         
         if self.id is not None:
-            self.dao.delete_usuario(self.id)
+            usuario_id = int(self.id)
+            self.dao.delete_usuario(usuario_id)
             self.id = None
 
     @classmethod

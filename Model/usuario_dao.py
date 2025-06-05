@@ -5,7 +5,9 @@ class UsuarioDao:
     def __init__(self, dbpath: str):
         self.conn = sqlite3.connect(dbpath)
         self.conn.row_factory = sqlite3.Row
+        self._create_table()
 
+    def _create_table(self):
         with self.conn as conn:
             cursor = conn.cursor()
             cursor.execute('''
@@ -18,48 +20,52 @@ class UsuarioDao:
             ''')
             conn.commit()
 
-    def add_usuario(self, nome: str, idade: Optional[int], email: str) -> str:
+    def add_usuario(self, nome: str, idade: Optional[int], email: str) -> int:
         with self.conn as conn:
             cursor = conn.cursor()
-            try:
-                cursor.execute('''
-                    INSERT INTO usuario (nome, idade, email)
-                    VALUES (?, ?, ?)
-                ''', (nome, idade, email))
-                conn.commit()
-                user_id = cursor.lastrowid
-                return f"Usuário '{nome}' adicionado com sucesso! ID: {user_id}"
-            except sqlite3.IntegrityError:
-                return f"Erro: O email '{email}' já está cadastrado."
+            cursor.execute('''
+                INSERT INTO usuario (nome, idade, email)
+                VALUES (?, ?, ?)
+            ''', (nome, idade, email))
+            conn.commit()
+            
 
-    def get_usuario(self, usuario_id: Optional[int] = None, nome: Optional[str] = None) -> List[Dict]:
+    def update_usuario(self, usuario_id: int, nome: str, idade: Optional[int], email: str):
         with self.conn as conn:
             cursor = conn.cursor()
+            cursor.execute('''
+                UPDATE usuario
+                SET nome = ?, idade = ?, email = ?
+                WHERE id = ?
+            ''', (nome, idade, email, usuario_id))
+            conn.commit()
 
+    def get_usuario(self, usuario_id: Optional[int] = None, nome: Optional[str] = None) -> Optional[Dict]:
+        with self.conn as conn:
+            cursor = conn.cursor()
             if usuario_id is not None:
                 cursor.execute('SELECT * FROM usuario WHERE id = ?', (usuario_id,))
             elif nome is not None:
                 cursor.execute('SELECT * FROM usuario WHERE nome = ?', (nome,))
             else:
-                cursor.execute('SELECT * FROM usuario')
+                return None
+            result = cursor.fetchone()
+            return dict(result) if result else None
 
-            usuarios = cursor.fetchall()
-            return [dict(u) for u in usuarios]
-
-    def delete_usuario(self, usuario_id: int) -> str:
+    def delete_usuario(self, usuario_id: int):
         with self.conn as conn:
             cursor = conn.cursor()
             cursor.execute('DELETE FROM usuario WHERE id = ?', (usuario_id,))
             conn.commit()
 
-            if cursor.rowcount == 0:
-                return f"Nenhum usuário com ID {usuario_id} encontrado."
-
-            return f"Usuário ID {usuario_id} deletado com sucesso."
-
-    def list_all(self) -> List[Dict]:
-        return self.get_usuario()
+    def list_usuarios(self) -> List[Dict]:
+        with self.conn as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM usuario')
+            usuarios = cursor.fetchall()
+            return [dict(u) for u in usuarios]
 
     def __del__(self):
         
         self.conn.close()
+

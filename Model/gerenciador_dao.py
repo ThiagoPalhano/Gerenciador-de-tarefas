@@ -1,6 +1,5 @@
 import sqlite3
-from typing import List, Optional
-
+from typing import List, Optional, Dict
 
 class GerenciadorDao:
     def __init__(self, dbpath: str):
@@ -21,14 +20,14 @@ class GerenciadorDao:
                     data_vencimento TEXT NOT NULL,
                     prioridade TEXT NOT NULL,
                     status_tarefa TEXT NOT NULL,
-                    FOREIGN KEY (usuario_ID) REFERENCES usuarios(id)
+                    FOREIGN KEY (usuario_ID) REFERENCES usuario(id)
                 )
             ''')
             conn.commit()
 
     def create_tarefa(self, usuario_ID: int, tarefa_nome: str, descricao: str,
                       data_criacao: str, data_vencimento: str,
-                      prioridade: str, status: str) -> int:
+                      prioridade: str, status: str) -> Optional[int]:
         with self.conn as conn:
             cursor = conn.cursor()
             cursor.execute('''
@@ -39,16 +38,15 @@ class GerenciadorDao:
             return cursor.lastrowid
 
     def update_tarefa(self, id: int, tarefa_nome: str, descricao: str,
-                      data_criacao: str, data_vencimento: str,
-                      prioridade: str, status: str):
+                      data_vencimento: str, prioridade: str, status: str):
         with self.conn as conn:
             cursor = conn.cursor()
             cursor.execute('''
                 UPDATE tarefas SET
-                    tarefa_nome = ?, descricao = ?, data_criacao = ?, 
+                    tarefa_nome = ?, descricao = ?, 
                     data_vencimento = ?, prioridade = ?, status_tarefa = ?
                 WHERE id = ?
-            ''', (tarefa_nome, descricao, data_criacao, data_vencimento, prioridade, status, id))
+            ''', (tarefa_nome, descricao, data_vencimento, prioridade, status, id))
             conn.commit()
 
     def delete_tarefa(self, id: int):
@@ -57,24 +55,25 @@ class GerenciadorDao:
             cursor.execute('DELETE FROM tarefas WHERE id = ?', (id,))
             conn.commit()
 
-    def get_tarefa(self, id: int) -> Optional[sqlite3.Row]:
+    def get_tarefa(self, id: int) -> Optional[Dict]:
         with self.conn as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM tarefas WHERE id = ?', (id,))
-            return cursor.fetchone()
+            row = cursor.fetchone()
+            return dict(row) if row else None
 
-    def list_tarefas(self) -> List[sqlite3.Row]:
+    def list_tarefas(self) -> List[Dict]:
         with self.conn as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM tarefas')
-            return cursor.fetchall()
+            return [dict(row) for row in cursor.fetchall()]
         
-    def list_tarefas_por_usuario(self, usuario_id: int) -> List[sqlite3.Row]:
+    def list_tarefas_por_usuario(self, usuario_id: int) -> List[Dict]:
         with self.conn as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM tarefas WHERE usuario_ID = ?', (usuario_id,))
-            return cursor.fetchall()
+            return [dict(row) for row in cursor.fetchall()]
 
     def __del__(self):
-        self.conn.close()
         
+        self.conn.close()
