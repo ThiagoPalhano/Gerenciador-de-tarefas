@@ -67,6 +67,14 @@ class UsuarioDao:
             cursor.execute('SELECT * FROM usuario')
             usuarios = cursor.fetchall()
             return [dict(u) for u in usuarios]
+        
+    def get_usuario_email(self, email: str) -> Optional[Dict]:
+        with self.conn as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM usuario WHERE email = ?', (email,))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
 
     def __del__(self):
         
