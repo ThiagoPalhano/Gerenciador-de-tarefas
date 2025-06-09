@@ -1,4 +1,4 @@
-from Model.gerenciador_tarefas import GerenciadorDao
+from Model.tarefas import GerenciadorDao
 from datetime import datetime
 
 gerenciador = GerenciadorDao("gerenciador_de_tarefas.db")

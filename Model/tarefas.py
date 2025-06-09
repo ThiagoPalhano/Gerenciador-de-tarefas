@@ -1,12 +1,20 @@
 from typing import Optional, List
-from Model.gerenciador_dao import GerenciadorDao
+from Model.tarefas_dao import GerenciadorDao
 
 
 class Tarefa:
-    dao: Optional[GerenciadorDao] = None
-
-    def __init__(self, id: Optional[int], usuario_id: int, tarefa_nome: str, descricao: str,
-                 data_criacao: str, data_vencimento: str, prioridade: str, status: str):
+    def __init__(
+        self,
+        id: Optional[int],
+        usuario_id: int,
+        tarefa_nome: str,
+        descricao: str,
+        data_criacao: str,
+        data_vencimento: str,
+        prioridade: str,
+        status: str,
+        dao: Optional[GerenciadorDao] = None
+    ):
         self.id = id
         self.usuario_id = usuario_id
         self.tarefa_nome = tarefa_nome
@@ -15,14 +23,9 @@ class Tarefa:
         self.data_vencimento = data_vencimento
         self.prioridade = prioridade
         self.status = status
-
-    @classmethod
-    def set_dao(cls, dao: GerenciadorDao):
-        cls.dao = dao
+        self.dao = dao or GerenciadorDao("gerenciador_de_tarefas.db")
 
     def save(self):
-        if self.dao is None:
-            raise ValueError("DAO não configurado. Use Tarefa.set_dao() para configurar.")
 
         if self.id is None:
             self.id = self.dao.create_tarefa(
@@ -45,19 +48,15 @@ class Tarefa:
             )
 
     def delete(self):
-        if self.dao is None:
-            raise ValueError("DAO não configurado. Use Tarefa.set_dao() para configurar.")
-
+        
         if self.id is not None:
             self.dao.delete_tarefa(self.id)
             self.id = None
 
     @classmethod
-    def get(cls, tarefa_id: int) -> Optional["Tarefa"]:
-        if cls.dao is None:
-            raise ValueError("DAO não configurado. Use Tarefa.set_dao() para configurar.")
-
-        data = cls.dao.get_tarefa(tarefa_id)
+    def get(cls, tarefa_id: int, dao: Optional[GerenciadorDao] = None) -> Optional["Tarefa"]:
+        dao = dao or GerenciadorDao("gerenciador_de_tarefas.db")
+        data = dao.get_tarefa(tarefa_id)
         if data:
             return cls(
                 id=data["id"],
@@ -68,15 +67,14 @@ class Tarefa:
                 data_vencimento=data["data_vencimento"],
                 prioridade=data["prioridade"],
                 status=data["status_tarefa"],
+                dao=dao
             )
         return None
 
     @classmethod
-    def all(cls) -> List["Tarefa"]:
-        if cls.dao is None:
-            raise ValueError("DAO não configurado. Use Tarefa.set_dao() para configurar.")
-
-        tarefas_data = cls.dao.list_tarefas()
+    def all(cls, dao: Optional[GerenciadorDao] = None) -> List["Tarefa"]:
+        dao = dao or GerenciadorDao("gerenciador_de_tarefas.db")
+        tarefas_data = dao.list_tarefas()
         return [
             cls(
                 id=data["id"],
@@ -87,6 +85,7 @@ class Tarefa:
                 data_vencimento=data["data_vencimento"],
                 prioridade=data["prioridade"],
                 status=data["status_tarefa"],
+                dao=dao
             )
             for data in tarefas_data
         ]

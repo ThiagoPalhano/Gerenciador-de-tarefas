@@ -1,4 +1,4 @@
-from Model.usuario_dao import UsuarioDao
+from Model.usuarios_dao import UsuarioDao
 
 usuario_dao = UsuarioDao("gerenciador_de_tarefas.db")
 
@@ -49,3 +49,4 @@ def menu_usuarios(acao: str, dados: dict):
 
 def fechar_usuarios():
     usuario_dao.conn.close()
+
