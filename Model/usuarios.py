@@ -5,7 +5,7 @@ from Model.usuarios_dao import UsuarioDao
 
 
 class Usuario:
-    def __init__(self, id: Optional[int], nome: str, idade: int, email: str, dao: Optional[UsuarioDao] = None):
+    def __init__(self, id: Optional[int], nome: str, idade:Optional[int], email: str, dao: Optional[UsuarioDao] = None):
         self.id = id
         self.nome = nome
         self.idade = idade
@@ -26,6 +26,15 @@ class Usuario:
         if self.id is not None:
             self.dao.delete_usuario(self.id)
             self.id = None
+        
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "nome": self.nome,
+            "idade": self.idade,
+            "email": self.email
+        }
 
     @classmethod
     def get(cls, usuario_id: int, dao: Optional[UsuarioDao] = None) -> Optional["Usuario"]:
@@ -55,3 +64,5 @@ class Usuario:
             )
             for data in usuarios_data
         ]
+
+    

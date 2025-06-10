@@ -1,6 +1,6 @@
-from Model.usuarios_dao import UsuarioDao
 
-usuario_dao = UsuarioDao("gerenciador_de_tarefas.db")
+
+from Model.usuarios import Usuario
 
 def menu_usuarios(acao: str, dados: dict):
     try:
@@ -8,35 +8,42 @@ def menu_usuarios(acao: str, dados: dict):
             nome = str(dados["nome"])
             idade = int(dados["idade"]) if dados.get("idade") else None
             email = str(dados["email"])
-            usuario_id = usuario_dao.add_usuario(nome, idade, email)
-            return f"Usuário criado com ID: {usuario_id}"
+            usuario = Usuario(None, nome, idade, email)
+            usuario.save()
+            return f"Usuário criado com ID: {usuario.id}"
 
         elif acao == "atualizar":
             usuario_id = int(dados["id"])
             nome = str(dados["nome"])
             idade = int(dados["idade"]) if dados.get("idade") else None
             email = str(dados["email"])
-            usuario_dao.update_usuario(usuario_id, nome, idade, email)
+            usuario = Usuario.get(usuario_id)
+            if not usuario:
+                return "Usuário não encontrado."
+            usuario.nome = nome
+            usuario.idade = idade
+            usuario.email = email
+            usuario.save()
             return "Usuário atualizado com sucesso!"
 
         elif acao == "buscar":
             usuario_id = dados.get("id")
-            nome = dados.get("nome")
             if usuario_id:
-                usuario = usuario_dao.get_usuario(usuario_id=int(usuario_id))
-            elif nome:
-                usuario = usuario_dao.get_usuario(nome=str(nome))
+                usuario = Usuario.get(int(usuario_id))
             else:
-                return "Informe id ou nome para buscar o usuário."
-            return usuario if usuario else "Usuário não encontrado."
+                return "Informe id para buscar o usuário."
+            return usuario.to_dict() if usuario else "Usuário não encontrado."
 
         elif acao == "listar":
-            usuarios = usuario_dao.list_usuarios()
-            return usuarios if usuarios else "Nenhum usuário encontrado."
+            usuarios = Usuario.all()
+            return [u.to_dict() for u in usuarios] if usuarios else "Nenhum usuário encontrado."
 
         elif acao == "deletar":
             usuario_id = int(dados["id"])
-            usuario_dao.delete_usuario(usuario_id)
+            usuario = Usuario.get(usuario_id)
+            if not usuario:
+                return "Usuário não encontrado."
+            usuario.delete()
             return "Usuário deletado com sucesso."
 
         else:
@@ -48,5 +55,6 @@ def menu_usuarios(acao: str, dados: dict):
         return f"Erro: {e}"
 
 def fechar_usuarios():
-    usuario_dao.conn.close()
+
+        pass
 

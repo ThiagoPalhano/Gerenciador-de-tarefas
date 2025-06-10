@@ -1,5 +1,5 @@
-from Controller.menu_usuarios import fechar_usuarios
-from Controller.menu_tarefas import fechar_tarefas
+
+
 from View.usuarios_view import gerenciar_usuarios
 from View.tarefas_view import gerenciar_tarefas         
 
@@ -18,8 +18,7 @@ def main():
             gerenciar_tarefas()
         elif escolha == '0':
             print("Saindo...")
-            fechar_usuarios()
-            fechar_tarefas()
+
             break
         else:
             print("Opção inválida. Tente novamente.")

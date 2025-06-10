@@ -1,3 +1,5 @@
+
+
 from typing import Optional, List
 from Model.tarefas_dao import GerenciadorDao
 
@@ -5,7 +7,7 @@ from Model.tarefas_dao import GerenciadorDao
 class Tarefa:
     def __init__(
         self,
-        id: Optional[int],
+
         usuario_id: int,
         tarefa_nome: str,
         descricao: str,
@@ -13,6 +15,7 @@ class Tarefa:
         data_vencimento: str,
         prioridade: str,
         status: str,
+        id=None,
         dao: Optional[GerenciadorDao] = None
     ):
         self.id = id
@@ -52,6 +55,9 @@ class Tarefa:
         if self.id is not None:
             self.dao.delete_tarefa(self.id)
             self.id = None
+
+    def to_dict(self):
+        return self.__dict__        
 
     @classmethod
     def get(cls, tarefa_id: int, dao: Optional[GerenciadorDao] = None) -> Optional["Tarefa"]:
